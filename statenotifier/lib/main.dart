@@ -1,95 +1,52 @@
-import 'package:example/my_state_notifier.dart';
+import 'dart:async';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_state_notifier/flutter_state_notifier.dart';
-import 'package:provider/provider.dart';
-
-// This is the default counter example reimplemented using StateNotifier + provider
-// It will print in the console the counter whenever it changes
-// The state change is also animated.
-
-// The "print to console" feature is abstracted through a "Logger" class like
-// we would do in production.
-
-// This showcase how our custom MyStateNotifier does not depend on Flutter,
-// but is still able to read providers and be used as usual in a Flutter app.
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        Provider<Logger>(create: (_) => ConsoleLogger()),
-        StateNotifierProvider<MyStateNotifier, MyState>(
-          create: (_) => MyStateNotifier(),
-          // Override MyState to make it animated
-          builder: (context, child) {
-            return TweenAnimationBuilder<MyState>(
-              duration: const Duration(milliseconds: 500),
-              tween: MyStateTween(end: context.watch<MyState>()),
-              builder: (context, state, _) {
-                return Provider.value(value: state, child: child);
-              },
-            );
-          },
-        ),
-      ],
-      child: MyApp(),
-    ),
-  );
+  runApp(const ProviderScope(
+    child: MyApp(),
+  ));
 }
-
-/// A [MyStateTween].
-///
-/// This will apply an [IntTween] on [MyState.count].
-class MyStateTween extends Tween<MyState> {
-  MyStateTween({MyState begin, MyState end}) : super(begin: begin, end: end);
-
-  @override
-  MyState lerp(double t) {
-    final countTween = IntTween(begin: begin.count, end: end.count);
-    // Tween the count
-    return MyState(
-      countTween.lerp(t),
-    );
-  }
-}
-
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Flutter Demo',
-      home: MyHomePage(),
-    );
+    return MaterialApp(home: MyHomePage(),debugShowCheckedModeBanner: false,);
   }
 }
+class Clock extends StateNotifier<DateTime>{
+  Clock() : super(DateTime.now()){
+    _timer = Timer.periodic(Duration(seconds: 1),(_){
+      state = DateTime.now();
+    });
+  }
+  late final Timer _timer;
 
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({Key key}) : super(key: key);
-
+  // @override 
+  // void dispose(){
+  //   _timer?.cancel();
+  //   super.dispose();
+  // }
+}
+final clockProvider = StateNotifierProvider<Clock, DateTime>((ref) {
+  return Clock();
+});
+class MyHomePage extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context,  ref) {
+    // this line is used to watch the provider's *state*
+    // to get an instance of the clock itself, call `watch(clockProvider.notifier)`
+    final currentTime = ref.watch(clockProvider);
+    // format the time as `hh:mm:ss`
+    final timeFormatted = DateFormat.Hms().format(currentTime);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Counter example'),
-      ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              context.select((MyState value) => value.count).toString(),
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+        child: Text(
+          timeFormatted,
+          style: Theme.of(context).textTheme.headline4,
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: context.watch<MyStateNotifier>().increment,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
