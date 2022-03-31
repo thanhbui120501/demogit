@@ -9,9 +9,6 @@ void main() {
   ));
 }
 
-final valueProvider = Provider<int>((ref) => 36);
-final counterProvider = StateProvider((ref) => 0);
-
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -20,6 +17,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(home: Home());
   }
 }
+
+final valueProvider = Provider<int>((ref) => 36);
+final counterProvider = StateProvider((ref) => 0);
 
 /// Providers are declared globally and specifies how to create a state
 
