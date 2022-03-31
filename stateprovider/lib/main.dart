@@ -26,10 +26,10 @@ final counterProvider = StateProvider((ref) => 0);
 class Home extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.listen<StateController<int>>(counterProvider.state,
-        (previous, current) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Value is: ${counterProvider.state}')));
+    ref.listen<int>(counterProvider, (previous, current) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content:
+              Text('Previous value is:$previous--Current value is: $current')));
     });
     return Scaffold(
       appBar: AppBar(title: const Text('Counter example')),
@@ -43,7 +43,11 @@ class Home extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         // The read method is an utility to read a provider without listening to it
-        onPressed: () => ref.read(counterProvider.state).state++,
+        onPressed: () {
+          ScaffoldMessenger.of(context).clearSnackBars();
+
+          ref.read(counterProvider.state).update((state) => state + 1);
+        },
         child: const Icon(Icons.add),
       ),
     );
