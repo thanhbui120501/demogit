@@ -55,11 +55,12 @@ class Database extends DatabaseServices {
   void delete(String id) {
     staffList.removeWhere((mStaff) => mStaff.id == id);
     _controller.sink.add(staffList);
+    
   }
 
   @override
   Staff read(String id) {
-    return staffList.lastWhere((mStaff) => mStaff.id == id);
+    return staffList.lastWhere((mStaff) => mStaff.id == id);    
   }
 
   @override

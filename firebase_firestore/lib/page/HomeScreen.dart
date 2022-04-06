@@ -55,6 +55,8 @@ class HomeScreen extends StatelessWidget {
             return ElevatedButton(
               child: const Icon(Icons.add),
               onPressed: () {
+                // final id = ref.watch(databaseProvider).staffList[1].id;
+                // ref.read(databaseProvider).read(id);
                 ref.read(databaseProvider).create(                  
                       Staff(
                         id: UniqueKey().toString(),

@@ -23,7 +23,7 @@ class StaffList extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => DeleteStaff(staffList: staffList,),
-                settings:  RouteSettings(arguments: index),
+                settings:  RouteSettings(arguments: staffList[index].id),
               ),
             );
           },

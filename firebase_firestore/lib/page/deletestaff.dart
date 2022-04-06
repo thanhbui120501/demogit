@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_firestore/Page/editstaff.dart';
 import 'package:firebase_firestore/services/database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,12 +13,15 @@ class DeleteStaff extends StatelessWidget {
     Key? key,
   }) : super(key: key);
   final List<Staff> staffList;
+  
   @override
   Widget build(BuildContext context) {
-    final arg = ModalRoute.of(context)!.settings.arguments as int;
-    
-    return Scaffold(
-      appBar: AppBar(
+    final id = ModalRoute.of(context)!.settings.arguments as String;
+    return Consumer(builder: (context,ref,_){
+      //final id = ref.watch(databaseProvider).staffList[arg].id;          
+      final deleteStaffList = ref.watch(databaseProvider).read(id);
+      return Scaffold(
+        appBar: AppBar(
         title: const Text('Staff Detail'),
       ),
       body: Stack(
@@ -27,41 +31,44 @@ class DeleteStaff extends StatelessWidget {
             width: 500,
             decoration: const BoxDecoration(color: Colors.orange),
           ),
-          Positioned(
-              top: 30,
-              left: 30,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'ID: ${staffList[arg].id}',
-                    style:const TextStyle(color: Colors.black),
-                  ),
-                  const SizedBox(
-                    height: 50,
-                  ),
-                  Text(
-                    'Fullname: ${staffList[arg].fullName}',
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                  const SizedBox(
-                    height: 50,
-                  ),
-                  Text(
-                    'Age: ${staffList[arg].age}',
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                ],
-              )
-          ),         
+          Consumer(builder: (context, ref, _) {
+             
+            return Positioned(
+                top: 30,
+                left: 30,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'ID: ${deleteStaffList.id}',
+                      style: const TextStyle(color: Colors.black),
+                    ),
+                    const SizedBox(
+                      height: 50,
+                    ),
+                    Text(
+                      'Fullname: ${deleteStaffList.fullName}',
+                      style: const TextStyle(color: Colors.black),
+                    ),
+                    const SizedBox(
+                      height: 50,
+                    ),
+                    Text(
+                      'Age: ${deleteStaffList.age}',
+                      style: const TextStyle(color: Colors.black),
+                    ),
+                  ],
+                ));
+          }),         
           Positioned(
             left: 30,
             top: 300,
             child: Consumer(
-              builder: (context,ref,_){
+              
+              builder: (context,ref,_){               
                 return ElevatedButton(
                   onPressed: (){
-                    ref.read(databaseProvider).delete(staffList[arg].id);
+                    ref.read(databaseProvider).delete(id);
 
                     Navigator.pop(context);
                   }, 
@@ -80,8 +87,8 @@ class DeleteStaff extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => DeleteStaff(staffList: staffList,),
-                        settings:  RouteSettings(arguments: arg),
+                        builder: (context) => EditStaff(staffList: staffList,), 
+                        settings:RouteSettings(arguments: id),                
                       ),
                     );
                   }, 
@@ -92,6 +99,7 @@ class DeleteStaff extends StatelessWidget {
           )
         ],
       ),
-    );
+      );
+    });   
   }
 }
